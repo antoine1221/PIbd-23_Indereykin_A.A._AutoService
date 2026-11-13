@@ -1,0 +1,13 @@
+﻿using ProjectAutoService.Entities;
+
+namespace ProjectAutoService.Repositories
+{
+    public interface ISparePartRepository
+    {
+        IEnumerable<SparePart> ReadSpareParts();
+        SparePart ReadSparePartById(int id);
+        void CreateSparePart(SparePart sparePart);
+        void UpdateSparePart(SparePart sparePart);
+        void DeleteSparePart(int id);
+    }
+}
