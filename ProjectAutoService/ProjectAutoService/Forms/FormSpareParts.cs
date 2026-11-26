@@ -1,4 +1,5 @@
-﻿using ProjectAutoService.Repositories;
+using ProjectAutoService.Entities;
+using ProjectAutoService.Repositories;
 using Unity;
 
 namespace ProjectAutoService.Forms
@@ -13,6 +14,12 @@ namespace ProjectAutoService.Forms
             InitializeComponent();
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _sparePartRepository = sparePartRepository ?? throw new ArgumentNullException(nameof(sparePartRepository));
+
+            FormDisplay.ConfigureListColumns(dataGridViewData,
+                (nameof(SparePart.Id), "Код"),
+                (nameof(SparePart.VendorCode), "Артикул"),
+                (nameof(SparePart.PartName), "Название запчасти"),
+                (nameof(SparePart.StockCount), "Количество на складе"));
         }
 
         private void FormSpareParts_Load(object sender, EventArgs e)

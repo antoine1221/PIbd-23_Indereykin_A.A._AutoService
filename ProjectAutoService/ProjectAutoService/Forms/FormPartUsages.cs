@@ -1,4 +1,5 @@
-﻿using ProjectAutoService.Repositories;
+using ProjectAutoService.Entities;
+using ProjectAutoService.Repositories;
 using Unity;
 
 namespace ProjectAutoService.Forms
@@ -13,6 +14,22 @@ namespace ProjectAutoService.Forms
             InitializeComponent();
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _partUsageRepository = partUsageRepository ?? throw new ArgumentNullException(nameof(partUsageRepository));
+
+            FormDisplay.ConfigureListColumns(dataGridViewData,
+                (nameof(PartUsage.Id), "Код"),
+                (nameof(PartUsage.MechanicId), "Код механика"),
+                (nameof(PartUsage.DateUsage), "Дата расхода"),
+                (nameof(PartUsage.SparePartPartUsages), "Запчасти"));
+            dataGridViewData.CellFormatting += (_, e) =>
+            {
+                if (e.ColumnIndex >= 0
+                    && dataGridViewData.Columns[e.ColumnIndex].Name == nameof(PartUsage.SparePartPartUsages)
+                    && e.Value is IEnumerable<SparePartPartUsage> spareParts)
+                {
+                    e.Value = string.Join("; ", spareParts.Select(part => $"№ {part.SparePartId}: {part.Count} шт."));
+                    e.FormattingApplied = true;
+                }
+            };
         }
 
         private void FormPartUsages_Load(object sender, EventArgs e)

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using ProjectAutoService.Entities;
 using ProjectAutoService.Entities.Enums;
 using ProjectAutoService.Repositories;
@@ -22,12 +22,10 @@ namespace ProjectAutoService.Forms
                     {
                         throw new InvalidDataException(nameof(serviceWork));
                     }
-                    foreach (CarBrand elem in Enum.GetValues(typeof(CarBrand)))
+                    for (var index = 0; index < checkedListBoxCarBrand.Items.Count; index++)
                     {
-                        if ((elem & serviceWork.CarBrand) != 0)
-                        {
-                            checkedListBoxCarBrand.SetItemChecked(checkedListBoxCarBrand.Items.IndexOf(elem), true);
-                        }
+                        var brand = (CarBrand)checkedListBoxCarBrand.Items[index];
+                        checkedListBoxCarBrand.SetItemChecked(index, serviceWork.CarBrand.HasFlag(brand));
                     }
                     textBoxWorkName.Text = serviceWork.WorkName;
                     numericUpDownNormHours.Value = (decimal)serviceWork.NormHours;
@@ -46,9 +44,12 @@ namespace ProjectAutoService.Forms
         {
             InitializeComponent();
             _serviceWorkRepository = serviceWorkRepository ?? throw new ArgumentNullException(nameof(serviceWorkRepository));
-            foreach (var elem in Enum.GetValues(typeof(CarBrand)))
+            foreach (var brand in Enum.GetValues<CarBrand>())
             {
-                checkedListBoxCarBrand.Items.Add(elem);
+                if (brand != CarBrand.None)
+                {
+                    checkedListBoxCarBrand.Items.Add(brand);
+                }
             }
         }
 

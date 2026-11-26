@@ -1,4 +1,4 @@
-﻿using ProjectAutoService.Entities;
+using ProjectAutoService.Entities;
 using ProjectAutoService.Repositories;
 
 namespace ProjectAutoService.Forms
@@ -25,11 +25,17 @@ namespace ProjectAutoService.Forms
         {
             try
             {
-                if (dataGridViewSpareParts.RowCount < 1 || comboBoxMechanic.SelectedIndex < 0)
+                if (comboBoxMechanic.SelectedValue is not int mechanicId)
                 {
-                    throw new Exception("Имеются незаполненные поля");
+                    throw new InvalidOperationException("Выберите механика.");
                 }
-                _partUsageRepository.CreatePartUsage(PartUsage.CreateOperation(0, (int)comboBoxMechanic.SelectedValue!, CreateListSparePartPartUsagesFromDataGrid()));
+                if (!dataGridViewSpareParts.EndEdit())
+                {
+                    throw new InvalidOperationException("Не удалось завершить ввод в таблице запчастей.");
+                }
+
+                var spareParts = CreateListSparePartPartUsagesFromDataGrid();
+                _partUsageRepository.CreatePartUsage(PartUsage.CreateOperation(0, mechanicId, spareParts));
                 Close();
             }
             catch (Exception ex)
@@ -45,11 +51,26 @@ namespace ProjectAutoService.Forms
             var list = new List<SparePartPartUsage>();
             foreach (DataGridViewRow row in dataGridViewSpareParts.Rows)
             {
-                if (row.Cells["ColumnSparePart"].Value == null || row.Cells["ColumnCount"].Value == null)
+                if (row.IsNewRow)
                 {
                     continue;
                 }
-                list.Add(SparePartPartUsage.CreateElement(0, Convert.ToInt32(row.Cells["ColumnSparePart"].Value), Convert.ToInt32(row.Cells["ColumnCount"].Value)));
+
+                var rowNumber = row.Index + 1;
+                if (row.Cells[ColumnSparePart.Index].Value is not int sparePartId)
+                {
+                    throw new InvalidOperationException($"Строка {rowNumber}: выберите запчасть.");
+                }
+                if (!int.TryParse(row.Cells[ColumnCount.Index].Value?.ToString(), out var count) || count <= 0)
+                {
+                    throw new InvalidOperationException($"Строка {rowNumber}: количество должно быть целым числом больше нуля.");
+                }
+                list.Add(SparePartPartUsage.CreateElement(0, sparePartId, count));
+            }
+
+            if (list.Count == 0)
+            {
+                throw new InvalidOperationException("Добавьте хотя бы одну запчасть.");
             }
             return list;
         }

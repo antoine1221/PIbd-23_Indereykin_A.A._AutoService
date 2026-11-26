@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using ProjectAutoService.Entities;
 using ProjectAutoService.Entities.Enums;
 using ProjectAutoService.Repositories;
@@ -39,7 +39,14 @@ namespace ProjectAutoService.Forms
         {
             InitializeComponent();
             _mechanicRepository = mechanicRepository ?? throw new ArgumentNullException(nameof(mechanicRepository));
-            comboBoxQualification.DataSource = Enum.GetValues(typeof(MechanicQualification));
+            comboBoxQualification.Format += (_, e) =>
+            {
+                if (e.ListItem is MechanicQualification qualification)
+                {
+                    e.Value = FormDisplay.QualificationName(qualification);
+                }
+            };
+            comboBoxQualification.DataSource = Enum.GetValues<MechanicQualification>();
         }
 
         private void ButtonSave_Click(object sender, EventArgs e)

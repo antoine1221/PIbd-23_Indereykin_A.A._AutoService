@@ -1,4 +1,5 @@
-﻿using ProjectAutoService.Repositories;
+using ProjectAutoService.Entities;
+using ProjectAutoService.Repositories;
 using Unity;
 
 namespace ProjectAutoService.Forms
@@ -13,6 +14,14 @@ namespace ProjectAutoService.Forms
             InitializeComponent();
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _serviceOrderRepository = serviceOrderRepository ?? throw new ArgumentNullException(nameof(serviceOrderRepository));
+
+            FormDisplay.ConfigureListColumns(dataGridViewData,
+                (nameof(ServiceOrder.Id), "Код"),
+                (nameof(ServiceOrder.ServiceWorkId), "Код работы"),
+                (nameof(ServiceOrder.MechanicId), "Код механика"),
+                (nameof(ServiceOrder.SparePartId), "Код запчасти"),
+                (nameof(ServiceOrder.OrderDate), "Дата записи"),
+                (nameof(ServiceOrder.WorkVolume), "Объём работ"));
         }
 
         private void FormServiceOrders_Load(object sender, EventArgs e)

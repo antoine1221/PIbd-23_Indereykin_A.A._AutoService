@@ -1,4 +1,6 @@
-﻿using ProjectAutoService.Repositories;
+using ProjectAutoService.Entities;
+using ProjectAutoService.Entities.Enums;
+using ProjectAutoService.Repositories;
 using Unity;
 
 namespace ProjectAutoService.Forms
@@ -13,6 +15,23 @@ namespace ProjectAutoService.Forms
             InitializeComponent();
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _serviceWorkRepository = serviceWorkRepository ?? throw new ArgumentNullException(nameof(serviceWorkRepository));
+
+            FormDisplay.ConfigureListColumns(dataGridViewData,
+                (nameof(ServiceWork.Id), "Код"),
+                (nameof(ServiceWork.CarBrand), "Марки авто"),
+                (nameof(ServiceWork.WorkName), "Наименование"),
+                (nameof(ServiceWork.NormHours), "Нормо-часы"),
+                (nameof(ServiceWork.Price), "Стоимость"));
+            dataGridViewData.CellFormatting += (_, e) =>
+            {
+                if (e.ColumnIndex >= 0
+                    && dataGridViewData.Columns[e.ColumnIndex].Name == nameof(ServiceWork.CarBrand)
+                    && e.Value is CarBrand.None)
+                {
+                    e.Value = "Не указаны";
+                    e.FormattingApplied = true;
+                }
+            };
         }
 
         private void FormServiceWorks_Load(object sender, EventArgs e)

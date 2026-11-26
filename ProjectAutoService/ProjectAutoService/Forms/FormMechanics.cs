@@ -1,4 +1,6 @@
-﻿using ProjectAutoService.Repositories;
+using ProjectAutoService.Entities;
+using ProjectAutoService.Entities.Enums;
+using ProjectAutoService.Repositories;
 using Unity;
 
 namespace ProjectAutoService.Forms
@@ -13,6 +15,22 @@ namespace ProjectAutoService.Forms
             InitializeComponent();
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _mechanicRepository = mechanicRepository ?? throw new ArgumentNullException(nameof(mechanicRepository));
+
+            FormDisplay.ConfigureListColumns(dataGridViewData,
+                (nameof(Mechanic.Id), "Код"),
+                (nameof(Mechanic.FullName), "ФИО"),
+                (nameof(Mechanic.MechanicQualification), "Квалификация"),
+                (nameof(Mechanic.Experience), "Стаж"));
+            dataGridViewData.CellFormatting += (_, e) =>
+            {
+                if (e.ColumnIndex >= 0
+                    && dataGridViewData.Columns[e.ColumnIndex].Name == nameof(Mechanic.MechanicQualification)
+                    && e.Value is MechanicQualification qualification)
+                {
+                    e.Value = FormDisplay.QualificationName(qualification);
+                    e.FormattingApplied = true;
+                }
+            };
         }
 
         private void FormMechanics_Load(object sender, EventArgs e)
