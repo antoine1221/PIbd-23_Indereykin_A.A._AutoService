@@ -1,1 +1,0 @@
-# PIbd-23_Indereykin_A.A._AutoService

@@ -83,7 +83,7 @@ namespace ProjectAutoService.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка при удалении", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(FormDisplay.DirectoryDeleteError(ex), "Ошибка при удалении", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

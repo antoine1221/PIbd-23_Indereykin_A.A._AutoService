@@ -1,11 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ProjectAutoService.Entities
 {
     public class ServiceOrder
     {
+        protected ServiceOrder() { }
+
+        [Key]
         public int Id { get; private set; }
         public int ServiceWorkId { get; private set; }
         public int MechanicId { get; private set; }
         public int SparePartId { get; private set; }
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime OrderDate { get; private set; }
         public int WorkVolume { get; private set; }
 
