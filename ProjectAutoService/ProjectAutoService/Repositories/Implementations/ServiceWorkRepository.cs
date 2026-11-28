@@ -1,30 +1,42 @@
-﻿using ProjectAutoService.Entities;
-using ProjectAutoService.Entities.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ProjectAutoService.Data;
+using ProjectAutoService.Entities;
 
-namespace ProjectAutoService.Repositories.Implementations
+namespace ProjectAutoService.Repositories.Implementations;
+
+internal sealed class ServiceWorkRepository(Func<DataContext> createContext, ILogger<ServiceWorkRepository> logger)
+    : RepositoryBase(createContext, logger), IServiceWorkRepository
 {
-    internal class ServiceWorkRepository : IServiceWorkRepository
+    public IEnumerable<ServiceWork> ReadServiceWorks() => Run(null,
+        db => db.ServiceWorks.AsNoTracking().OrderBy(x => x.Id).ToList(), rows => rows.Count);
+
+    public ServiceWork ReadServiceWorkById(int id) => Run(id,
+        db => db.ServiceWorks.AsNoTracking().SingleOrDefault(x => x.Id == id) ?? Missing(id), x => x.Id);
+
+    public void CreateServiceWork(ServiceWork entity) => Run(entity, db =>
     {
-        public void CreateServiceWork(ServiceWork serviceWork)
-        {
-        }
+        db.ServiceWorks.Add(entity);
+        db.SaveChanges();
+        return entity.Id;
+    }, id => id);
 
-        public void DeleteServiceWork(int id)
-        {
-        }
+    public void UpdateServiceWork(ServiceWork entity) => Run(entity, db =>
+    {
+        var existing = db.ServiceWorks.Find(entity.Id) ?? Missing(entity.Id);
+        db.Entry(existing).CurrentValues.SetValues(entity);
+        db.SaveChanges();
+        return entity.Id;
+    }, id => id);
 
-        public ServiceWork ReadServiceWorkById(int id)
-        {
-            return ServiceWork.CreateEntity(0, CarBrand.None, string.Empty, 0, 0);
-        }
+    public void DeleteServiceWork(int id) => Run(id, db =>
+    {
+        var existing = db.ServiceWorks.Find(id) ?? Missing(id);
+        db.ServiceWorks.Remove(existing);
+        db.SaveChanges();
+        return id;
+    }, deletedId => deletedId);
 
-        public IEnumerable<ServiceWork> ReadServiceWorks()
-        {
-            return [];
-        }
-
-        public void UpdateServiceWork(ServiceWork serviceWork)
-        {
-        }
-    }
+    private static ServiceWork Missing(int id) =>
+        throw new KeyNotFoundException($"Работа с кодом {id} не найдена.");
 }
